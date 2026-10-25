@@ -15,8 +15,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOrganisasiRouteImport } from './routes/_authenticated/organisasi'
+import { Route as AuthenticatedPerencanaRouteImport } from './routes/_authenticated/perencana'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedOrganisasiOrganizationIdRouteImport } from './routes/_authenticated/organisasi.$organizationId'
+import { Route as ApiPublicTournamentPlanRouteImport } from './routes/api/public/tournament-plan'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,6 +49,11 @@ const AuthenticatedOrganisasiRoute = AuthenticatedOrganisasiRouteImport.update({
   path: '/organisasi',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPerencanaRoute = AuthenticatedPerencanaRouteImport.update({
+  id: '/perencana',
+  path: '/perencana',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   id: '/profil',
   path: '/profil',
@@ -58,6 +65,11 @@ const AuthenticatedOrganisasiOrganizationIdRoute =
     path: '/$organizationId',
     getParentRoute: () => AuthenticatedOrganisasiRoute,
   } as any)
+const ApiPublicTournamentPlanRoute = ApiPublicTournamentPlanRouteImport.update({
+  id: '/api/public/tournament-plan',
+  path: '/api/public/tournament-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,8 +77,10 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
+  '/perencana': typeof AuthenticatedPerencanaRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
+  '/api/public/tournament-plan': typeof ApiPublicTournamentPlanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -74,8 +88,10 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
+  '/perencana': typeof AuthenticatedPerencanaRoute
   '/profil': typeof AuthenticatedProfilRoute
   '/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
+  '/api/public/tournament-plan': typeof ApiPublicTournamentPlanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,8 +101,10 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
+  '/_authenticated/perencana': typeof AuthenticatedPerencanaRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
+  '/api/public/tournament-plan': typeof ApiPublicTournamentPlanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,8 +114,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/organisasi'
+    | '/perencana'
     | '/profil'
     | '/organisasi/$organizationId'
+    | '/api/public/tournament-plan'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -105,8 +125,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/organisasi'
+    | '/perencana'
     | '/profil'
     | '/organisasi/$organizationId'
+    | '/api/public/tournament-plan'
   id:
     | '__root__'
     | '/'
@@ -115,8 +137,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/organisasi'
+    | '/_authenticated/perencana'
     | '/_authenticated/profil'
     | '/_authenticated/organisasi/$organizationId'
+    | '/api/public/tournament-plan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -124,6 +148,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicTournamentPlanRoute: typeof ApiPublicTournamentPlanRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -170,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrganisasiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/perencana': {
+      id: '/_authenticated/perencana'
+      path: '/perencana'
+      fullPath: '/perencana'
+      preLoaderRoute: typeof AuthenticatedPerencanaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profil': {
       id: '/_authenticated/profil'
       path: '/profil'
@@ -183,6 +215,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/organisasi/$organizationId'
       preLoaderRoute: typeof AuthenticatedOrganisasiOrganizationIdRouteImport
       parentRoute: typeof AuthenticatedOrganisasiRoute
+    }
+    '/api/public/tournament-plan': {
+      id: '/api/public/tournament-plan'
+      path: '/api/public/tournament-plan'
+      fullPath: '/api/public/tournament-plan'
+      preLoaderRoute: typeof ApiPublicTournamentPlanRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -205,12 +244,14 @@ const AuthenticatedOrganisasiRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOrganisasiRoute: typeof AuthenticatedOrganisasiRouteWithChildren
+  AuthenticatedPerencanaRoute: typeof AuthenticatedPerencanaRoute
   AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOrganisasiRoute: AuthenticatedOrganisasiRouteWithChildren,
+  AuthenticatedPerencanaRoute: AuthenticatedPerencanaRoute,
   AuthenticatedProfilRoute: AuthenticatedProfilRoute,
 }
 
@@ -222,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicTournamentPlanRoute: ApiPublicTournamentPlanRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

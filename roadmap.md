@@ -1,6 +1,7 @@
 # Roadmap
 - [x] Phase 1: Foundation, design system, auth, profiles
 - [ ] Phase 2: Organizations, members, roles, RLS, audit log
+- [ ] AI tournament setup planner: sport, format, requirements → reviewable plan via AI Gateway
 - [ ] Phase 3: Events + categories, public event page
 - [ ] Phase 4: Registration forms, registrations, teams, uploads
 - [ ] Phase 5: Payments adapter + gateway (needs Midtrans/Xendit choice + sandbox keys)

@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_planner_access: {
+        Row: {
+          blocked_reason: string | null
+          last_requested_at: string
+          organization_id: string
+          user_id: string
+        }
+        Insert: {
+          blocked_reason?: string | null
+          last_requested_at?: string
+          organization_id: string
+          user_id: string
+        }
+        Update: {
+          blocked_reason?: string | null
+          last_requested_at?: string
+          organization_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_planner_access_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_audit_logs: {
         Row: {
           action: string
@@ -199,6 +228,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      begin_tournament_plan: { Args: { _org: string }; Returns: undefined }
       has_org_role: {
         Args: {
           _org: string

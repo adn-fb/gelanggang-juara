@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedOrganisasiRouteImport } from './routes/_authenticated/organisasi'
 import { Route as AuthenticatedPerencanaRouteImport } from './routes/_authenticated/perencana'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
+import { Route as AuthenticatedRegistrasiRouteImport } from './routes/_authenticated/registrasi'
 import { Route as AuthenticatedOrganisasiOrganizationIdRouteImport } from './routes/_authenticated/organisasi.$organizationId'
 import { Route as ApiPublicTournamentPlanRouteImport } from './routes/api/public/tournament-plan'
 
@@ -59,6 +60,11 @@ const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   path: '/profil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRegistrasiRoute = AuthenticatedRegistrasiRouteImport.update({
+  id: '/registrasi',
+  path: '/registrasi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrganisasiOrganizationIdRoute =
   AuthenticatedOrganisasiOrganizationIdRouteImport.update({
     id: '/$organizationId',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
   '/perencana': typeof AuthenticatedPerencanaRoute
   '/profil': typeof AuthenticatedProfilRoute
+  '/registrasi': typeof AuthenticatedRegistrasiRoute
   '/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
   '/api/public/tournament-plan': typeof ApiPublicTournamentPlanRoute
 }
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
   '/perencana': typeof AuthenticatedPerencanaRoute
   '/profil': typeof AuthenticatedProfilRoute
+  '/registrasi': typeof AuthenticatedRegistrasiRoute
   '/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
   '/api/public/tournament-plan': typeof ApiPublicTournamentPlanRoute
 }
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/_authenticated/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
   '/_authenticated/perencana': typeof AuthenticatedPerencanaRoute
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
+  '/_authenticated/registrasi': typeof AuthenticatedRegistrasiRoute
   '/_authenticated/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
   '/api/public/tournament-plan': typeof ApiPublicTournamentPlanRoute
 }
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/organisasi'
     | '/perencana'
     | '/profil'
+    | '/registrasi'
     | '/organisasi/$organizationId'
     | '/api/public/tournament-plan'
   fileRoutesByTo: FileRoutesByTo
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/organisasi'
     | '/perencana'
     | '/profil'
+    | '/registrasi'
     | '/organisasi/$organizationId'
     | '/api/public/tournament-plan'
   id:
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/_authenticated/organisasi'
     | '/_authenticated/perencana'
     | '/_authenticated/profil'
+    | '/_authenticated/registrasi'
     | '/_authenticated/organisasi/$organizationId'
     | '/api/public/tournament-plan'
   fileRoutesById: FileRoutesById
@@ -209,6 +221,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/registrasi': {
+      id: '/_authenticated/registrasi'
+      path: '/registrasi'
+      fullPath: '/registrasi'
+      preLoaderRoute: typeof AuthenticatedRegistrasiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/organisasi/$organizationId': {
       id: '/_authenticated/organisasi/$organizationId'
       path: '/$organizationId'
@@ -246,6 +265,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrganisasiRoute: typeof AuthenticatedOrganisasiRouteWithChildren
   AuthenticatedPerencanaRoute: typeof AuthenticatedPerencanaRoute
   AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
+  AuthenticatedRegistrasiRoute: typeof AuthenticatedRegistrasiRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -253,6 +273,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrganisasiRoute: AuthenticatedOrganisasiRouteWithChildren,
   AuthenticatedPerencanaRoute: AuthenticatedPerencanaRoute,
   AuthenticatedProfilRoute: AuthenticatedProfilRoute,
+  AuthenticatedRegistrasiRoute: AuthenticatedRegistrasiRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

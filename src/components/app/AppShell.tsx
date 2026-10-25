@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut, UserRound, Building2, Sparkles } from "lucide-react";
+import { LayoutDashboard, LogOut, UserRound, Building2, Sparkles, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "./Logo";
@@ -9,6 +9,7 @@ import { Logo } from "./Logo";
 const nav = [
   { to: "/dashboard", label: "Dasbor", icon: LayoutDashboard },
   { to: "/organisasi", label: "Organisasi", icon: Building2 },
+  { to: "/registrasi", label: "Registrasi", icon: ClipboardList },
   { to: "/perencana", label: "Perencana AI", icon: Sparkles },
   { to: "/profil", label: "Profil", icon: UserRound },
 ] as const;

@@ -23,7 +23,7 @@ export function createResponsesCall(
   const reasoning = config.model !== "openai/chat-latest";
   const result = streamText({
     model: provider.responses(config.model),
-    ...(instructions ? { instructions } : {}),
+    ...(instructions ? { system: instructions } : {}),
     messages,
     abortSignal: request.signal,
     maxRetries: 0,

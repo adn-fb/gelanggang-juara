@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "description", content: "Ringkasan turnamen dan organisasi Anda di Arena." },
       { property: "og:title", content: "Dasbor — Arena" },
       { property: "og:description", content: "Ringkasan turnamen dan organisasi Anda di Arena." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(profileQuery(context.user.id)),
@@ -19,7 +21,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const upcoming = [
-  { icon: Building2, title: "Organisasi", text: "Buat organisasi dan undang tim panitia." },
   { icon: Trophy, title: "Turnamen", text: "Atur event, kategori, dan kuota peserta." },
   { icon: ClipboardList, title: "Pendaftaran", text: "Formulir dan verifikasi peserta." },
   { icon: CalendarDays, title: "Jadwal & hasil", text: "Bagan, jadwal, dan klasemen otomatis." },
@@ -46,6 +47,7 @@ function Dashboard() {
       ) : null}
 
       <h2 className="mt-10 text-lg font-semibold">Segera hadir</h2>
+      <div className="mt-4 flex flex-wrap gap-3"><Button asChild variant="brand"><Link to="/organisasi"><Building2/>Organisasi saya</Link></Button><Button asChild variant="outline"><Link to="/perencana">Perencana turnamen AI</Link></Button></div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {upcoming.map(({ icon: Icon, title, text }) => (
           <div key={title} className="flex gap-3 rounded-xl border bg-card p-4 shadow-card">

@@ -27,6 +27,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Masuk ke Arena untuk mengelola turnamen dan pendaftaran Anda." },
       { property: "og:title", content: "Masuk atau Daftar — Arena" },
       { property: "og:description", content: "Masuk ke Arena untuk mengelola turnamen dan pendaftaran Anda." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,

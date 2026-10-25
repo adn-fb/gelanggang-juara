@@ -1,13 +1,15 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut, UserRound, Building2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "./Logo";
 
 const nav = [
   { to: "/dashboard", label: "Dasbor", icon: LayoutDashboard },
+  { to: "/organisasi", label: "Organisasi", icon: Building2 },
+  { to: "/perencana", label: "Perencana AI", icon: Sparkles },
   { to: "/profil", label: "Profil", icon: UserRound },
 ] as const;
 
@@ -31,6 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={to}
               to={to}
+              aria-label={label}
               className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
               activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}
             >

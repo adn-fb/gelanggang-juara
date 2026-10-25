@@ -44,12 +44,12 @@ function ResetPassword() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     const parsed = passwordSchema.safeParse(password);
-    if (!parsed.success) return setError(parsed.error.issues[0].message);
+    if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? "Kata sandi tidak valid"); return; }
     setError(null);
     setLoading(true);
     const { error: err } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (err) return setError(translateAuthError(err.message));
+    if (err) { setError(translateAuthError(err.message)); return; }
     toast.success("Kata sandi berhasil diperbarui.");
     navigate({ to: "/dashboard", replace: true });
   }

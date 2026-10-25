@@ -61,8 +61,8 @@ function ProfilePage() {
 
   async function onAvatar(file: File | undefined) {
     if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return toast.error("Gunakan gambar JPG, PNG, atau WebP.");
-    if (file.size > MAX_AVATAR) return toast.error("Ukuran foto maksimal 2 MB.");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) { toast.error("Gunakan gambar JPG, PNG, atau WebP."); return; }
+    if (file.size > MAX_AVATAR) { toast.error("Ukuran foto maksimal 2 MB."); return; }
     setUploading(true);
     try {
       const ext = file.type.split("/")[1];

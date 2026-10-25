@@ -16,7 +16,7 @@ type Mode = "masuk" | "daftar" | "lupa";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s.redirect === "string" ? s.redirect : undefined }),
+  validateSearch: (s: Record<string, unknown>): { redirect?: string } => ({ redirect: typeof s["redirect"] === "string" ? s["redirect"] : undefined }),
   beforeLoad: async ({ search }) => {
     const { data } = await supabase.auth.getSession();
     if (data.session) throw redirect({ to: safeRedirect(search.redirect) });
@@ -50,26 +50,26 @@ function AuthPage() {
     try {
       if (mode === "masuk") {
         const p = signInSchema.safeParse(form);
-        if (!p.success) return setError(p.error.issues[0].message);
+        if (!p.success) { setError(p.error.issues[0]?.message ?? "Data tidak valid"); return; }
         const { error: err } = await supabase.auth.signInWithPassword(p.data);
-        if (err) return setError(translateAuthError(err.message));
+        if (err) { setError(translateAuthError(err.message)); return; }
         navigate({ to: dest, replace: true });
       } else if (mode === "daftar") {
         const p = signUpSchema.safeParse(form);
-        if (!p.success) return setError(p.error.issues[0].message);
+        if (!p.success) { setError(p.error.issues[0]?.message ?? "Data tidak valid"); return; }
         const { data, error: err } = await supabase.auth.signUp({
           email: p.data.email,
           password: p.data.password,
           options: { emailRedirectTo: window.location.origin + dest, data: { full_name: p.data.fullName } },
         });
-        if (err) return setError(translateAuthError(err.message));
+        if (err) { setError(translateAuthError(err.message)); return; }
         if (data.session) navigate({ to: dest, replace: true });
         else setSent("confirm");
       } else {
         const p = emailSchema.safeParse(form.email);
-        if (!p.success) return setError(p.error.issues[0].message);
+        if (!p.success) { setError(p.error.issues[0]?.message ?? "Data tidak valid"); return; }
         const { error: err } = await supabase.auth.resetPasswordForEmail(p.data, { redirectTo: `${window.location.origin}/reset-password` });
-        if (err) return setError(translateAuthError(err.message));
+        if (err) { setError(translateAuthError(err.message)); return; }
         setSent("reset");
       }
     } finally {
@@ -80,7 +80,7 @@ function AuthPage() {
   async function oauth(provider: "google" | "lovable") {
     setError(null);
     const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin + "/auth?redirect=" + encodeURIComponent(dest) });
-    if (r.error) return toast.error("Gagal masuk. Coba lagi.");
+    if (r.error) { toast.error("Gagal masuk. Coba lagi."); return; }
     if (r.redirected) return;
     navigate({ to: dest, replace: true });
   }

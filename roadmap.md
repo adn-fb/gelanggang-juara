@@ -1,7 +1,10 @@
 # Roadmap
 - [x] Phase 1: Foundation, design system, auth, profiles
-- [ ] Phase 2: Organizations, members, roles, RLS, audit log
-- [ ] AI tournament setup planner: sport, format, requirements → reviewable plan via AI Gateway
+- [x] Phase 2 implementation: Organizations, members, email-bound in-app invitations, roles, RLS, atomic audit log
+- [ ] Phase 2 authenticated end-to-end verification (blocked: no registered auth users; requester must sign up and sign in)
+- [ ] Invitation email delivery (blocked: sender domain not configured)
+- [x] AI tournament setup planner implementation and real AI Gateway response check
+- [ ] AI planner authenticated end-to-end verification (blocked: no registered auth users)
 - [ ] Phase 3: Events + categories, public event page
 - [ ] Phase 4: Registration forms, registrations, teams, uploads
 - [ ] Phase 5: Payments adapter + gateway (needs Midtrans/Xendit choice + sandbox keys)

@@ -75,10 +75,15 @@ export async function handlePlanner(request: Request) {
         controller.enqueue(encoder.encode(JSON.stringify(data) + "\n"));
       try {
         let text = "";
-        for await (const chunk of call.result.textStream) {
-          text += chunk;
-          send({ text: chunk });
+        for await (const chunk of call.result.fullStream) {
+          if (chunk.type === "error") throw chunk.error;
+          if (chunk.type === "text-delta") {
+            text += chunk.text;
+            send({ text: chunk.text });
+          }
         }
+        if ((await call.result.finishReason) === "content-filter")
+          throw new Error("AI tidak dapat memenuhi permintaan ini.");
         if (!text.trim()) throw new Error("AI tidak menghasilkan rencana.");
         send({ done: true });
       } catch (error) {

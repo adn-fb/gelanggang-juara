@@ -1,0 +1,26 @@
+import { useState } from 'react';
+import { createFileRoute,Link } from '@tanstack/react-router';
+import { useSuspenseQuery,useQueryClient } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
+import { Building2,Plus,ArrowUpRight,Mail,Loader2 } from 'lucide-react';
+import { AppShell } from '@/components/app/AppShell';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Dialog,DialogContent,DialogHeader,DialogTitle,DialogTrigger } from '@/components/ui/dialog';
+import { organizationsQuery,organizationSchema,roleLabels } from '@/lib/organizations';
+import { organizationAction } from '@/lib/organizations.functions';
+import { pageHead } from '@/lib/page-head';
+export const Route=createFileRoute('/_authenticated/organisasi')({head:()=>pageHead('Organisasi','Organisasi dan undangan panitia turnamen Anda.'),loader:({context})=>context.queryClient.ensureQueryData(organizationsQuery(context.user.id)),component:Organizations});
+function Organizations(){
+ const {user}=Route.useRouteContext(); const {data}=useSuspenseQuery(organizationsQuery(user.id)); const client=useQueryClient();const action=useServerFn(organizationAction);
+ const [open,setOpen]=useState(false),[name,setName]=useState(''),[description,setDescription]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ async function perform(kind:'create'|'accept'|'decline',payload:Record<string,string>){setBusy(true);setError('');try{await action({data:{action:kind,organizationId:null,payload}});await client.invalidateQueries({queryKey:['organizations']});if(kind==='create'){setOpen(false);setName('');setDescription('');}}catch(e){setError(e instanceof Error?e.message:'Tindakan gagal.');}finally{setBusy(false);}}
+ const invitations=data.invitations.filter(i=>i.email===user.email?.toLowerCase());
+ return <AppShell><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-medium text-brand">Ruang penyelenggara</p><h1 className="mt-1 text-3xl font-semibold">Organisasi</h1></div><Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button variant="brand"><Plus/>Buat organisasi</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Organisasi baru</DialogTitle></DialogHeader><form className="space-y-4" onSubmit={e=>{e.preventDefault();const parsed=organizationSchema.safeParse({name,description});if(!parsed.success){setError('Nama harus 2–120 karakter; deskripsi maksimal 1.000 karakter.');return;}void perform('create',parsed.data);}}><div className="space-y-2"><Label htmlFor="org-name">Nama organisasi</Label><Input id="org-name" value={name} onChange={e=>setName(e.target.value)} required minLength={2} maxLength={120}/></div><div className="space-y-2"><Label htmlFor="org-description">Deskripsi</Label><Textarea id="org-description" value={description} onChange={e=>setDescription(e.target.value)} maxLength={1000}/></div>{error&&<p role="alert" className="text-sm text-destructive">{error}</p>}<Button disabled={busy} type="submit" variant="brand">{busy&&<Loader2 className="animate-spin"/>}Simpan organisasi</Button></form></DialogContent></Dialog></div>
+ {!open&&error&&<p role="alert" className="mt-4 text-destructive">{error}</p>}
+ {invitations.length>0&&<section className="mt-8 border-y py-6"><h2 className="flex items-center gap-2 text-lg font-semibold"><Mail className="size-5 text-brand"/>Undangan masuk</h2><div className="mt-4 space-y-4">{invitations.map(i=><div key={i.id} className="flex flex-wrap items-center justify-between gap-3"><div><p className="font-semibold">{i.organization_name}</p><p className="text-sm text-muted-foreground">{roleLabels[i.role]} · Berlaku hingga {new Date(i.expires_at).toLocaleDateString('id-ID',{timeZone:'Asia/Jakarta'})}</p></div><div className="flex gap-2"><Button variant="outline" disabled={busy} onClick={()=>void perform('decline',{id:i.id})}>Tolak</Button><Button variant="brand" disabled={busy} onClick={()=>void perform('accept',{id:i.id})}>Terima undangan</Button></div></div>)}</div></section>}
+ {data.organizations.length===0?<section className="py-24 text-center"><Building2 className="mx-auto size-12 text-muted-foreground"/><h2 className="mt-5 text-xl font-semibold">Belum ada organisasi</h2><p className="mt-2 text-sm text-muted-foreground">Organisasi Anda akan tampil di sini.</p></section>:<div className="mt-8 grid gap-4 sm:grid-cols-2">{data.organizations.map(org=><Link key={org.id} to="/organisasi/$organizationId" params={{organizationId:org.id}} className="group rounded-lg border bg-card p-5 shadow-card transition-colors hover:border-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><div className="flex items-center justify-between"><Building2 className="size-7 text-brand"/><ArrowUpRight className="size-5 text-muted-foreground"/></div><h2 className="mt-5 break-words text-lg font-semibold">{org.name}</h2><p className="mt-1 text-sm text-brand">{roleLabels[data.memberships.find(m=>m.organization_id===org.id)?.role??'viewer']}</p>{org.description&&<p className="mt-3 line-clamp-3 break-words text-sm text-muted-foreground">{org.description}</p>}</Link>)}</div>}
+ </AppShell>;
+}

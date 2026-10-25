@@ -19,3 +19,4 @@
 - Organization invitations are email-bound in-app invitations; app email delivery requires a verified sender domain and must not be presented as sent until delivery is wired.
 - AI planner calls use the Responses SDK and streaming authenticated server routes; durable per-user access controls block terminal gateway failures and no automated retry is performed.
 - Client-importable server functions live in `src/lib/*.functions.ts`; server-only AI helpers use `.server.ts` modules to keep secrets out of the browser bundle.
+- Tournament setup and registration use authenticated transactional SQL functions with tenant validation and audit writes; payment amounts come from the event and only trusted payment confirmation may change unpaid status, preventing client-side financial forgery.

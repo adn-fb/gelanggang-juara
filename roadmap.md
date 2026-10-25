@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Requested registration increment: tournament setup, team/player entry, separate unpaid payment record, dashboard participants, authenticated verification
 - [x] Phase 1: Foundation, design system, auth, profiles
 - [x] Phase 2 implementation: Organizations, members, email-bound in-app invitations, roles, RLS, atomic audit log
 - [ ] Phase 2 authenticated end-to-end verification (blocked: no registered auth users; requester must sign up and sign in)

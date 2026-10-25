@@ -8,6 +8,20 @@
       "when": 1792925256674,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792926249761,
+      "tag": "0001_organizations_members_invitations_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792926384515,
+      "tag": "0002_ai_planner_access_controls",
+      "breakpoints": true
     }
   ]
 }

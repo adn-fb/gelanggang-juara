@@ -22,6 +22,8 @@ export const Route = createFileRoute("/_authenticated/profil")({
       { name: "description", content: "Kelola nama, nomor WhatsApp, dan foto profil Anda." },
       { property: "og:title", content: "Profil Saya — Arena" },
       { property: "og:description", content: "Kelola nama, nomor WhatsApp, dan foto profil Anda." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(profileQuery(context.user.id)),

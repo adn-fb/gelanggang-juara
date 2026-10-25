@@ -1,0 +1,347 @@
+import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, UserPlus, Trash2, Loader2, Copy } from "lucide-react";
+import { AppShell } from "@/components/app/AppShell";
+import { RoleSelect } from "@/components/app/RoleSelect";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  organizationQuery,
+  canManage,
+  canManageMember,
+  roleLabels,
+  type OrgRole,
+} from "@/lib/organizations";
+import { organizationAction } from "@/lib/organizations.functions";
+import { pageHead } from "@/lib/page-head";
+export const Route = createFileRoute("/_authenticated/organisasi/$organizationId")({
+  head: () =>
+    pageHead(
+      "Tim organisasi",
+      "Anggota, undangan, pengaturan dan riwayat aktivitas organisasi Arena.",
+    ),
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(organizationQuery(params.organizationId, context.user.id)),
+  errorComponent: () => (
+    <AppShell>
+      <h1 className="text-2xl font-semibold">Organisasi tidak tersedia</h1>
+      <p className="mt-3 text-muted-foreground">
+        Anda tidak memiliki akses atau organisasi tidak ditemukan.
+      </p>
+      <Button asChild variant="outline" className="mt-6">
+        <Link to="/organisasi">Kembali ke organisasi</Link>
+      </Button>
+    </AppShell>
+  ),
+  component: Organization,
+});
+const actions: Record<string, string> = {
+  create: "Organisasi dibuat",
+  update: "Organisasi diperbarui",
+  invite: "Anggota diundang",
+  accept: "Undangan diterima",
+  decline: "Undangan ditolak",
+  revoke: "Undangan dibatalkan",
+  role: "Peran diubah",
+  remove: "Anggota dihapus",
+};
+function Organization() {
+  const { user } = Route.useRouteContext(),
+    { organizationId } = Route.useParams();
+  const { data } = useSuspenseQuery(organizationQuery(organizationId, user.id));
+  const client = useQueryClient(),
+    action = useServerFn(organizationAction);
+  const [email, setEmail] = useState(""),
+    [role, setRole] = useState<OrgRole>("viewer"),
+    [name, setName] = useState(data.organization.name),
+    [description, setDescription] = useState(data.organization.description),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(""),
+    [success, setSuccess] = useState("");
+  const manager = canManage(data.myRole),
+    owner = data.myRole === "owner";
+  async function perform(
+    kind: "invite" | "revoke" | "role" | "remove" | "update",
+    payload: Record<string, string>,
+  ) {
+    setBusy(true);
+    setError("");
+    setSuccess("");
+    try {
+      await action({ data: { action: kind, organizationId, payload } });
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["organization", organizationId] }),
+        client.invalidateQueries({ queryKey: ["organizations"] }),
+      ]);
+      setSuccess(
+        kind === "invite"
+          ? "Undangan tersedia di akun penerima; email belum dikirim."
+          : "Perubahan tersimpan.",
+      );
+      if (kind === "invite") setEmail("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Tindakan gagal.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <AppShell>
+      <Link
+        to="/organisasi"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground"
+      >
+        <ArrowLeft className="size-4" />
+        Organisasi
+      </Link>
+      <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="break-words text-3xl font-semibold">{data.organization.name}</h1>
+          <p className="mt-2 text-sm text-brand">
+            {data.myRole && roleLabels[data.myRole]} · {data.members.length} anggota
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/perencana" search={{ organizationId }}>
+            Perencana AI
+          </Link>
+        </Button>
+      </div>
+      {error && (
+        <p role="alert" className="mt-5 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+      {success && (
+        <p role="status" className="mt-5 text-sm text-brand">
+          {success}
+        </p>
+      )}
+      <Tabs defaultValue="members" className="mt-8">
+        <TabsList className="h-auto flex-wrap">
+          <TabsTrigger value="members">Anggota</TabsTrigger>
+          {manager && (
+            <>
+              <TabsTrigger value="invites">Undangan</TabsTrigger>
+              <TabsTrigger value="audit">Aktivitas</TabsTrigger>
+              <TabsTrigger value="settings">Pengaturan</TabsTrigger>
+            </>
+          )}
+        </TabsList>
+        <TabsContent value="members">
+          <div className="divide-y">
+            {data.members.map((m) => (
+              <div key={m.id} className="flex flex-wrap items-center gap-4 py-5">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words font-semibold">
+                    {m.display_name}
+                    {m.user_id === user.id && (
+                      <span className="ml-2 text-xs text-muted-foreground">Anda</span>
+                    )}
+                  </p>
+                  <p className="break-all text-sm text-muted-foreground">{m.email}</p>
+                </div>
+                {data.myRole && canManageMember(data.myRole, m.role) ? (
+                  <div className="flex w-full items-center gap-2 sm:w-64">
+                    <RoleSelect
+                      value={m.role}
+                      owner={owner}
+                      disabled={busy}
+                      label={`Peran ${m.display_name}`}
+                      onChange={(r) => void perform("role", { id: m.id, role: r })}
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      disabled={busy}
+                      title="Hapus anggota"
+                      aria-label={`Hapus ${m.display_name}`}
+                      onClick={() => {
+                        if (window.confirm(`Hapus ${m.display_name} dari organisasi?`))
+                          void perform("remove", { id: m.id });
+                      }}
+                    >
+                      <Trash2 className="text-destructive" />
+                    </Button>
+                  </div>
+                ) : (
+                  <span className="text-sm text-muted-foreground">{roleLabels[m.role]}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+        {manager && (
+          <>
+            <TabsContent value="invites">
+              <form
+                className="grid gap-4 border-b py-6 sm:grid-cols-[1fr_220px_auto]"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void perform("invite", { email, role });
+                }}
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="invite-email">Email anggota</Label>
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    maxLength={255}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Peran</Label>
+                  <RoleSelect value={role} owner={owner} onChange={setRole} disabled={busy} />
+                </div>
+                <Button type="submit" variant="brand" disabled={busy} className="self-end">
+                  {busy ? <Loader2 className="animate-spin" /> : <UserPlus />}Undang anggota
+                </Button>
+              </form>
+              <div className="divide-y">
+                {data.invitations.length === 0 && (
+                  <p className="py-10 text-sm text-muted-foreground">Belum ada undangan.</p>
+                )}
+                {data.invitations.map((i) => {
+                  const pending = i.status === "pending" && new Date(i.expires_at) > new Date();
+                  return (
+                    <div
+                      key={i.id}
+                      className="flex flex-wrap items-center justify-between gap-3 py-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="break-all font-medium">{i.email}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {roleLabels[i.role]} ·{" "}
+                          {pending
+                            ? "Menunggu"
+                            : i.status === "pending"
+                              ? "Kedaluwarsa"
+                              : (
+                                  {
+                                    accepted: "Diterima",
+                                    declined: "Ditolak",
+                                    revoked: "Dibatalkan",
+                                    expired: "Kedaluwarsa",
+                                  } as Record<string, string>
+                                )[i.status]}{" "}
+                          ·{" "}
+                          {new Date(i.expires_at).toLocaleDateString("id-ID", {
+                            timeZone: "Asia/Jakarta",
+                          })}
+                        </p>
+                      </div>
+                      {pending && (owner || i.role !== "org_admin") && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(
+                                  `${window.location.origin}/organisasi`,
+                                );
+                                setSuccess(
+                                  "Tautan disalin. Penerima harus masuk menggunakan email undangan.",
+                                );
+                              } catch {
+                                setError("Tautan tidak dapat disalin.");
+                              }
+                            }}
+                          >
+                            <Copy />
+                            Salin tautan
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={busy}
+                            onClick={() => void perform("revoke", { id: i.id })}
+                          >
+                            Batalkan
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+            <TabsContent value="audit">
+              <h2 className="py-5 text-lg font-semibold">Riwayat aktivitas</h2>
+              <div className="divide-y">
+                {data.audit.map((log) => (
+                  <div key={log.id} className="flex flex-wrap justify-between gap-2 py-4">
+                    <div className="min-w-0">
+                      <p className="font-medium">{actions[log.action] ?? log.action}</p>
+                      <p className="break-words text-sm text-muted-foreground">{log.actor_name}</p>
+                      {log.details &&
+                        typeof log.details === "object" &&
+                        !Array.isArray(log.details) && (
+                          <p className="break-all text-sm text-muted-foreground">
+                            {typeof log.details["email"] === "string" ? log.details["email"] : ""}
+                            {typeof log.details["role"] === "string"
+                              ? ` · ${roleLabels[log.details["role"] as OrgRole] ?? log.details["role"]}`
+                              : ""}
+                          </p>
+                        )}
+                    </div>
+                    <time className="text-xs text-muted-foreground">
+                      {new Date(log.created_at).toLocaleString("id-ID", {
+                        timeZone: "Asia/Jakarta",
+                      })}{" "}
+                      WIB
+                    </time>
+                  </div>
+                ))}
+              </div>
+              {data.audit.length >= 100 && (
+                <p className="mt-4 text-sm text-muted-foreground">100 aktivitas terbaru</p>
+              )}
+            </TabsContent>
+            <TabsContent value="settings">
+              <form
+                className="max-w-xl space-y-5 py-6"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void perform("update", { name, description });
+                }}
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Nama organisasi</Label>
+                  <Input
+                    id="edit-name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={120}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-description">Deskripsi</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    maxLength={1000}
+                  />
+                </div>
+                <Button variant="brand" disabled={busy} type="submit">
+                  Simpan perubahan
+                </Button>
+              </form>
+            </TabsContent>
+          </>
+        )}
+      </Tabs>
+    </AppShell>
+  );
+}

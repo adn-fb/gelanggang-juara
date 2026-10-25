@@ -14,7 +14,9 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedOrganisasiRouteImport } from './routes/_authenticated/organisasi'
 import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
+import { Route as AuthenticatedOrganisasiOrganizationIdRouteImport } from './routes/_authenticated/organisasi.$organizationId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,25 +42,40 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrganisasiRoute = AuthenticatedOrganisasiRouteImport.update({
+  id: '/organisasi',
+  path: '/organisasi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
   id: '/profil',
   path: '/profil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrganisasiOrganizationIdRoute =
+  AuthenticatedOrganisasiOrganizationIdRouteImport.update({
+    id: '/$organizationId',
+    path: '/$organizationId',
+    getParentRoute: () => AuthenticatedOrganisasiRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
   '/profil': typeof AuthenticatedProfilRoute
+  '/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
   '/profil': typeof AuthenticatedProfilRoute
+  '/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,13 +84,29 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/organisasi': typeof AuthenticatedOrganisasiRouteWithChildren
   '/_authenticated/profil': typeof AuthenticatedProfilRoute
+  '/_authenticated/organisasi/$organizationId': typeof AuthenticatedOrganisasiOrganizationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/reset-password' | '/dashboard' | '/profil'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/organisasi'
+    | '/profil'
+    | '/organisasi/$organizationId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/dashboard' | '/profil'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard'
+    | '/organisasi'
+    | '/profil'
+    | '/organisasi/$organizationId'
   id:
     | '__root__'
     | '/'
@@ -81,7 +114,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/dashboard'
+    | '/_authenticated/organisasi'
     | '/_authenticated/profil'
+    | '/_authenticated/organisasi/$organizationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/organisasi': {
+      id: '/_authenticated/organisasi'
+      path: '/organisasi'
+      fullPath: '/organisasi'
+      preLoaderRoute: typeof AuthenticatedOrganisasiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profil': {
       id: '/_authenticated/profil'
       path: '/profil'
@@ -135,16 +177,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/organisasi/$organizationId': {
+      id: '/_authenticated/organisasi/$organizationId'
+      path: '/$organizationId'
+      fullPath: '/organisasi/$organizationId'
+      preLoaderRoute: typeof AuthenticatedOrganisasiOrganizationIdRouteImport
+      parentRoute: typeof AuthenticatedOrganisasiRoute
+    }
   }
 }
 
+interface AuthenticatedOrganisasiRouteChildren {
+  AuthenticatedOrganisasiOrganizationIdRoute: typeof AuthenticatedOrganisasiOrganizationIdRoute
+}
+
+const AuthenticatedOrganisasiRouteChildren: AuthenticatedOrganisasiRouteChildren =
+  {
+    AuthenticatedOrganisasiOrganizationIdRoute:
+      AuthenticatedOrganisasiOrganizationIdRoute,
+  }
+
+const AuthenticatedOrganisasiRouteWithChildren =
+  AuthenticatedOrganisasiRoute._addFileChildren(
+    AuthenticatedOrganisasiRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedOrganisasiRoute: typeof AuthenticatedOrganisasiRouteWithChildren
   AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedOrganisasiRoute: AuthenticatedOrganisasiRouteWithChildren,
   AuthenticatedProfilRoute: AuthenticatedProfilRoute,
 }
 

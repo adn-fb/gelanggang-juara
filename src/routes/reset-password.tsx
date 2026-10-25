@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -41,7 +41,7 @@ function ResetPassword() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
     const parsed = passwordSchema.safeParse(password);
     if (!parsed.success) return setError(parsed.error.issues[0].message);

@@ -22,6 +22,13 @@
       "when": 1792926384515,
       "tag": "0002_ai_planner_access_controls",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792930262263,
+      "tag": "0003_tournament_registration",
+      "breakpoints": true
     }
   ]
 }

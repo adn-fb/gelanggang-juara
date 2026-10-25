@@ -223,12 +223,192 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organization_id: string
+          registration_fee: number
+          sport: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          organization_id: string
+          registration_fee?: number
+          sport: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          registration_fee?: number
+          sport?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_players: {
+        Row: {
+          full_name: string
+          id: string
+          jersey_number: number
+          organization_id: string
+          registration_id: string
+        }
+        Insert: {
+          full_name: string
+          id?: string
+          jersey_number: number
+          organization_id: string
+          registration_id: string
+        }
+        Update: {
+          full_name?: string
+          id?: string
+          jersey_number?: number
+          organization_id?: string
+          registration_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_players_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_players_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_registration_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          organization_id: string
+          payer_name: string
+          registration_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          organization_id: string
+          payer_name: string
+          registration_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          organization_id?: string
+          payer_name?: string
+          registration_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_registration_payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_registration_payments_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: true
+            referencedRelation: "tournament_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tournament_registrations: {
+        Row: {
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          event_id: string
+          id: string
+          organization_id: string
+          status: string
+          team_name: string
+          user_id: string
+        }
+        Insert: {
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          event_id: string
+          id?: string
+          organization_id: string
+          status?: string
+          team_name: string
+          user_id: string
+        }
+        Update: {
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          organization_id?: string
+          status?: string
+          team_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_registrations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       begin_tournament_plan: { Args: { _org: string }; Returns: undefined }
+      create_tournament_event: {
+        Args: { _fee: number; _name: string; _org: string; _sport: string }
+        Returns: string
+      }
       has_org_role: {
         Args: {
           _org: string
@@ -239,6 +419,10 @@ export type Database = {
       is_org_member: { Args: { _org: string }; Returns: boolean }
       organization_action: {
         Args: { _action: string; _org?: string; _payload?: Json }
+        Returns: string
+      }
+      submit_tournament_registration: {
+        Args: { _payload: Json }
         Returns: string
       }
     }

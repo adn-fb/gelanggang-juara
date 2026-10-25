@@ -1,0 +1,11 @@
+# Roadmap
+- [x] Phase 1: Foundation, design system, auth, profiles
+- [ ] Phase 2: Organizations, members, roles, RLS, audit log
+- [ ] Phase 3: Events + categories, public event page
+- [ ] Phase 4: Registration forms, registrations, teams, uploads
+- [ ] Phase 5: Payments adapter + gateway (needs Midtrans/Xendit choice + sandbox keys)
+- [ ] Phase 6: Competition formats + schedule generator
+- [ ] Phase 7: Match results, verification, standings, brackets
+- [ ] Phase 8: Tickets + QR check-in
+- [ ] Phase 9: Certificates, sponsors, gallery, exports
+- [ ] Phase 10: Monetization, analytics, platform admin
